@@ -1,17 +1,7 @@
 const TuyaOpenAPI = require("./lib/tuyaopenapi");
 const TuyaSHOpenAPI = require("./lib/tuyashopenapi");
 const TuyaOpenMQ = require("./lib/tuyamqttapi");
-const OutletAccessory = require('./lib/outlet_accessory');
-const LightAccessory = require('./lib/light_accessory');
 const SwitchAccessory = require('./lib/switch_accessory');
-const SmokeSensorAccessory = require('./lib/smokesensor_accessory');
-const Fanv2Accessory = require('./lib/fanv2_accessory');
-const HeaterAccessory = require('./lib/heater_accessory');
-const GarageDoorAccessory = require('./lib/garagedoor_accessory');
-const AirPurifierAccessory = require('./lib/air_purifier_accessory')
-const WindowCoveringAccessory = require('./lib/window_covering_accessory')
-const ContactSensorAccessory = require('./lib/contactsensor_accessory');
-const LeakSensorAccessory = require('./lib/leak_sensor_accessory')
 
 const LogUtil = require('./util/logutil')
 const DataUtil = require('./util/datautil')
@@ -23,11 +13,11 @@ module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
   // registerAccessory' three parameters is plugin-name, accessory-name, constructor-name
-  homebridge.registerPlatform('homebridge-tuya-platform', 'TuyaPlatform', TuyaPlatform, true);
+  homebridge.registerPlatform('homebridge-ultimacosa-platform', 'UltimaCosaPlatform', UltimaCosaPlatform, true);
 }
 
 // Accessory constructor
-class TuyaPlatform {
+class UltimaCosaPlatform {
   constructor(log, config, api) {
     this.log = new LogUtil(
       config.options.debug,
@@ -47,7 +37,7 @@ class TuyaPlatform {
       // Platform Plugin should only register new accessory that doesn't exist in homebridge after this event.
       // Or start discover new accessories.
       this.api.on('didFinishLaunching', function () {
-        this.log.log("Initializing TuyaPlatform...");
+        this.log.log("Initializing UltimaCosaPlatform...");
         this.initTuyaSDK(config);
       }.bind(this));
     }
@@ -116,77 +106,15 @@ class TuyaPlatform {
     // Construct new accessory
     let deviceAccessory;
     switch (deviceType) {
-      case 'kj':
-        deviceAccessory = new AirPurifierAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'dj':
-      case 'dd':
-      case 'fwd':
-      case 'tgq':
-      case 'xdd':
-      case 'dc':
-      case 'tgkg':
-        deviceAccessory = new LightAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'cz':
-      case 'pc':
-        var deviceData = new DataUtil().getSubService(device.status)
-        deviceAccessory = new OutletAccessory(this, homebridgeAccessory, device, deviceData);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'kg':
-      case 'tdq':
+      case 'kt':
         var deviceData = new DataUtil().getSubService(device.status)
         deviceAccessory = new SwitchAccessory(this, homebridgeAccessory, device, deviceData);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'fs':
-      case 'fskg':
-        deviceAccessory = new Fanv2Accessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'ywbj':
-        deviceAccessory = new SmokeSensorAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'qn':
-        deviceAccessory = new HeaterAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'ckmkzq': //garage_door_opener
-        deviceAccessory = new GarageDoorAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'cl':
-        deviceAccessory = new WindowCoveringAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'mcs':
-        deviceAccessory = new ContactSensorAccessory(this, homebridgeAccessory, device);
-        this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
-        this.deviceAccessories.set(uuid, deviceAccessory);
-        break;
-      case 'rqbj':
-      case 'jwbj':
-        deviceAccessory = new LeakSensorAccessory(this, homebridgeAccessory, device);
         this.accessories.set(uuid, deviceAccessory.homebridgeAccessory);
         this.deviceAccessories.set(uuid, deviceAccessory);
         break;
       default:
         break;
     }
-
   }
 
   //Handle device deletion, addition, status update
@@ -219,7 +147,7 @@ class TuyaPlatform {
   // Called from device classes
   registerPlatformAccessory(platformAccessory) {
     this.log.log(`Register Platform Accessory ${platformAccessory.displayName}`);
-    this.api.registerPlatformAccessories('homebridge-tuya-platform', 'TuyaPlatform', [platformAccessory]);
+    this.api.registerPlatformAccessories('homebridge-ultimacosa-platform', 'UltimaCosaPlatform', [platformAccessory]);
   }
 
   // Function invoked when homebridge tries to restore cached accessory.
@@ -242,7 +170,7 @@ class TuyaPlatform {
   removeAccessory(accessory) {
     if (accessory) {
       this.log.log(`Remove Accessory ${accessory}`);
-      this.api.unregisterPlatformAccessories("homebridge-tuya-platform", "TuyaPlatform", [accessory]);
+      this.api.unregisterPlatformAccessories("homebridge-ultimacosa-platform", "UltimaCosaPlatform", [accessory]);
       this.accessories.delete(accessory.uuid);
       this.deviceAccessories.delete(accessory.uuid);
     }
