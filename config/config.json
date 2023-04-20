@@ -10,8 +10,8 @@
 
     "platforms": [
         {
-            "platform": "TuyaPlatform",
-            "name": "TuyaPlatform",
+            "platform": "UltimaCosaPlatform",
+            "name": "UltimaCosaPlatform",
             "options":
               {
                 "username": "",
@@ -21,7 +21,7 @@
                 "lang": "en",
                 "projectType": "2",
                 "appSchema": "tuyaSmart",
-                "countryCode": 86,
+                "countryCode": 1,
                 "debug":false
               }
         }
