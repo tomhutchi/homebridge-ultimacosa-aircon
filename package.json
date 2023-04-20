@@ -1,6 +1,6 @@
 {
   "name": "homebridge-ultimacosa-aircon",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Ultima Cosa Homebridge Plugin",
   "main": "index.js",
   "scripts": {
